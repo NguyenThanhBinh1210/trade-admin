@@ -25,15 +25,15 @@ const Login = () => {
   const onSubmit = (data: FormData) => {
     mutation.mutate(data, {
       onSuccess: (dataUser) => {
-        console.log(dataUser);
-        // const newUser = omit(dataUser.data.user, ['password', 'isAdmin'])
-        // setProfile(newUser)
-        // toast.success('Đăng nhập thành công!')
-        // setIsAuthenticated(true)
-        // navigate('/')
+        console.log(dataUser)
+        const newUser = omit(dataUser.data.user, ['password'])
+        setProfile(newUser)
+        toast.success(dataUser.data.message)
+        setIsAuthenticated(true)
+        navigate('/')
       },
       onError: (data: any) => {
-        // setError(data.response.data)
+        toast.warn(data.response.data.errMessage)
       }
     })
   }

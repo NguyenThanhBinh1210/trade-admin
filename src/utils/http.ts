@@ -1,6 +1,6 @@
 import axios, { type AxiosInstance } from 'axios'
 import omit from 'lodash/omit'
-import { getAccessTokenFromLS } from './auth'
+import { getAccessTokenFromLS, setAccesTokenToLS, setProfileFromLS } from './auth'
 
 class Http {
   instance: AxiosInstance
@@ -31,12 +31,11 @@ class Http {
       const { url } = response.config
       if (url === '/v1/auth/login') {
         const dataProfile = response
-        console.log(dataProfile)
-        // const newUser = omit(dataProfile.data.user, ['password', 'isAdmin'])
-        // this.accessToken = response.data.token
+        const newUser = omit(dataProfile.data.user, ['password'])
+        this.accessToken = response.data.token
         // this.refreshToken = response.data.refresh_token
-        // setProfileFromLS(newUser as any)
-        // setAccesTokenToLS(this.accessToken)
+        setProfileFromLS(newUser as any)
+        setAccesTokenToLS(this.accessToken)
         // setRefreshTokenToLS(this.refreshToken)
       } else if (url === '/user/log-out') {
         // this.accessToken = ''

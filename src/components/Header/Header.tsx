@@ -9,7 +9,7 @@ import { clearLS } from '~/utils/auth'
 
 const Header = () => {
   const [showMenu, setShowMenu] = useState(false)
-  const { reset } = useContext(AppContext)
+  const { profile, reset } = useContext(AppContext)
 
   const handleLogout = () => {
     reset()
@@ -47,28 +47,30 @@ const Header = () => {
         <ul className='space-y-2'>
           <li>
             <Link
-              to='/'
+              to='/comment'
               className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
             >
-              <button>Danh sách key</button>
+              <button>Danh sách bình luận</button>
             </Link>
           </li>
           <li>
             <Link
-              to='/user'
+              to='/contact'
               className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
             >
-              <button>Danh sách tài khoản</button>
+              <button>Danh sách liên hệ</button>
             </Link>
           </li>
-          <li>
-            <Link
-              to='/option'
-              className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
-            >
-              <button>Danh sách Option</button>
-            </Link>
-          </li>
+          {profile?.isAdmin && (
+            <li>
+              <Link
+                to='/user'
+                className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
+              >
+                <button>Danh sách tài khoản</button>
+              </Link>
+            </li>
+          )}
         </ul>
         <ul className='mt-auto'>
           <li className=''>

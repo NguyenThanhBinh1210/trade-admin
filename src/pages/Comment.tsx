@@ -6,7 +6,7 @@ import CreateModal from '~/components/Modal/CreateModal'
 import { AppContext } from '~/contexts/app.context'
 import { FormatNumber } from '~/hooks/useFormatNumber'
 
-const Option = () => {
+const Comment = () => {
   const { profile } = useContext(AppContext)
   const [data, setData] = useState(null)
   const [isModalOpen, setModalOpen] = useState(false)
@@ -167,4 +167,4 @@ const Option = () => {
   )
 }
 
-export default Option
+export default Comment

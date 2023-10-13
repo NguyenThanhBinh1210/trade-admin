@@ -5,8 +5,9 @@ import AdminLayout from './layouts/AdminLayout'
 import { AppContext } from './contexts/app.context'
 import RegisterLayout from './layouts/RegisterLayout'
 import Login from './pages/Login'
-import Option from './pages/Option'
 import Users from './pages/Users'
+import Comment from './pages/Comment'
+import Contact from './pages/Contact'
 
 function ProtecedRoute() {
   const { isAuthenticated } = React.useContext(AppContext)
@@ -16,7 +17,28 @@ function RejectedRoute() {
   const { isAuthenticated } = React.useContext(AppContext)
   return !isAuthenticated ? <Outlet /> : <Navigate to='/' />
 }
+
 const useRouteElements = () => {
+  const { profile } = React.useContext(AppContext)
+  const isAdmin = profile?.isAdmin
+
+  const getAdminRoutes = () => {
+    if (!isAdmin) {
+      return []
+    }
+
+    return [
+      {
+        path: '/user',
+        element: (
+          <AdminLayout>
+            <Users />
+          </AdminLayout>
+        )
+      }
+    ]
+  }
+
   const routeElements = useRoutes([
     {
       path: '',
@@ -41,26 +63,28 @@ const useRouteElements = () => {
           index: true,
           element: (
             <AdminLayout>
-              <Dashboard />
+              <div>kk</div>
             </AdminLayout>
           )
         },
         {
-          path: '/option',
+          path: '/comment',
           element: (
             <AdminLayout>
-              <Option />
+              <Contact />
             </AdminLayout>
           )
         },
         {
-          path: '/user',
+          path: '/contact',
           element: (
             <AdminLayout>
-              <Users />
+              <Comment />
             </AdminLayout>
           )
-        }
+        },
+        // Spread to include all routes returned by getAdminRoutes
+        ...getAdminRoutes()
       ]
     }
   ])
