@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useMutation } from 'react-query'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { logout } from '~/apis/auth.api'
 import { AppContext } from '~/contexts/app.context'
@@ -10,11 +10,12 @@ import { clearLS } from '~/utils/auth'
 const Header = () => {
   const [showMenu, setShowMenu] = useState(false)
   const { profile, reset } = useContext(AppContext)
-
+  const navigate = useNavigate()
   const handleLogout = () => {
     reset()
     clearLS()
     toast.success('Đăng xuất thành công!')
+    navigate('/login')
   }
   const [isDarkMode, toggleDarkMode] = useDarkMode()
   const modalRef = useRef<HTMLDivElement>(null)
@@ -29,17 +30,15 @@ const Header = () => {
     <div
       ref={modalRef}
       id='drawer-navigation'
-      className={`${
-        showMenu ? 'mobile:translate-x-[0] ' : 'mobile:translate-x-[-100%] '
-      } dark:bg-gray-700 mobile:fixed non-scroll dark:border-none border-r border-gray-300 top-0 relative left-0 z-40 h-screen p-4  transition-all  bg-white w-80 mobile:w-[240px]`}
+      className={`${showMenu ? 'mobile:translate-x-[0] ' : 'mobile:translate-x-[-100%] '
+        } dark:bg-gray-700 mobile:fixed non-scroll dark:border-none border-r border-gray-300 top-0 relative left-0 z-40 h-screen p-4  transition-all  bg-white w-80 mobile:w-[240px]`}
       tabIndex={-1}
       aria-labelledby='drawer-navigation-label'
     >
       <div
         id='drawer-navigation-label'
-        className={` ${
-          showMenu ? 'hidden' : ''
-        } text-blue-400 flex justify-between items-center text-base font-semibold uppercase dark:text-gray-400 `}
+        className={` ${showMenu ? 'hidden' : ''
+          } text-blue-400 flex justify-between items-center text-base font-semibold uppercase dark:text-gray-400 `}
       >
         <h2>Admin</h2>
       </div>

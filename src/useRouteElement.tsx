@@ -19,26 +19,6 @@ function RejectedRoute() {
 }
 
 const useRouteElements = () => {
-  const { profile } = React.useContext(AppContext)
-  const isAdmin = profile?.isAdmin
-
-  const getAdminRoutes = () => {
-    if (!isAdmin) {
-      return []
-    }
-
-    return [
-      {
-        path: '/user',
-        element: (
-          <AdminLayout>
-            <Users />
-          </AdminLayout>
-        )
-      }
-    ]
-  }
-
   const routeElements = useRoutes([
     {
       path: '',
@@ -82,9 +62,7 @@ const useRouteElements = () => {
               <Comment />
             </AdminLayout>
           )
-        },
-        // Spread to include all routes returned by getAdminRoutes
-        ...getAdminRoutes()
+        }
       ]
     }
   ])
