@@ -5,9 +5,9 @@ import AdminLayout from './layouts/AdminLayout'
 import { AppContext } from './contexts/app.context'
 import RegisterLayout from './layouts/RegisterLayout'
 import Login from './pages/Login'
-import Users from './pages/Users'
 import Comment from './pages/Comment'
 import Contact from './pages/Contact'
+import Users from './pages/Users'
 
 function ProtecedRoute() {
   const { isAuthenticated } = React.useContext(AppContext)
@@ -60,6 +60,14 @@ const useRouteElements = () => {
           element: (
             <AdminLayout>
               <Comment />
+            </AdminLayout>
+          )
+        },
+        {
+          path: '/user',
+          element: (
+            <AdminLayout>
+              <Users />
             </AdminLayout>
           )
         }
