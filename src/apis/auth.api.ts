@@ -5,7 +5,7 @@ interface BodyUpdateProfile extends Omit<User, '_id' | 'role' | 'createdAt' | 'u
   newPassword?: string
 }
 
-export const loginAccount = (body: { username: string; password: string }) => http.post('/user/auth/sign-in', body)
+export const loginAccount = (body: { email: string; password: string }) => http.post('/v1/auth/login', body)
 export const logout = () => http.post('/user/log-out')
 export const updateUser = (id: unknown, params?: Omit<BodyUpdateProfile, '_id'>) =>
   http.put<User>(`/user/update-user/${id}`, params)

@@ -23,22 +23,19 @@ const Login = () => {
     return loginAccount(body)
   })
   const onSubmit = (data: FormData) => {
-    // mutation.mutate(data, {
-    //   onSuccess: (dataUser) => {
-    //     const newUser = omit(dataUser.data.user, ['password', 'isAdmin'])
-    //     setProfile(newUser)
-    //     toast.success('Đăng nhập thành công!')
-    //     setIsAuthenticated(true)
-    //     navigate('/')
-    //   },
-    //   onError: (data: any) => {
-    //     setError(data.response.data)
-    //   }
-    // })
-    setProfile({ newUser: "asdasdas" })
-    toast.success('Đăng nhập thành công!')
-    setIsAuthenticated(true)
-    navigate('/')
+    mutation.mutate(data, {
+      onSuccess: (dataUser) => {
+        console.log(dataUser);
+        // const newUser = omit(dataUser.data.user, ['password', 'isAdmin'])
+        // setProfile(newUser)
+        // toast.success('Đăng nhập thành công!')
+        // setIsAuthenticated(true)
+        // navigate('/')
+      },
+      onError: (data: any) => {
+        // setError(data.response.data)
+      }
+    })
   }
 
   return (
@@ -54,7 +51,7 @@ const Login = () => {
             inputPassword={false}
             register={register}
             placeholder={'example@gmail.com'}
-            name='username'
+            name='email'
           />
           <Input
             onFocus={() => setError(null)}
