@@ -1,5 +1,9 @@
-import React, { useRef } from 'react'
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useEffect, useRef, useState } from 'react'
+import { Staff } from './CreateStaff'
+import { useMutation, useQueryClient } from 'react-query'
+import { updateStaff } from '~/apis/product.api'
+import { toast } from 'react-toastify'
 const Modal = ({ isOpen, onClose, data }: any) => {
   const modalRef = useRef<HTMLDivElement>(null)
   const handleModalClick = (e: React.MouseEvent) => {
@@ -7,15 +11,69 @@ const Modal = ({ isOpen, onClose, data }: any) => {
       onClose()
     }
   }
+  const initialFromState = {
+    name: '',
+    username: '',
+    password: '',
+    email: '',
+    isStaff: true,
+    isAdmin: false
+  }
+  const queryClient = useQueryClient()
+  const mutation = useMutation((body: Staff) => {
+    return updateStaff(data._id, body)
+  })
+  const mutationChangeAvatar = useMutation((avatar) => {
+    return updateStaff(data._id, { avatar })
+  })
+  const [formState, setFormState] = useState(initialFromState)
+  useEffect(() => {
+    setFormState(data)
+  }, [data])
 
+  const handleChange = (name: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFormState((prev) => ({ ...prev, [name]: event.target.value }))
+  }
+
+  const handleAvatar = (e: any) => {
+    const formData: any = new FormData()
+    const file = e.target.files[0]
+    if (file) {
+      formData.append('avatar', file)
+      console.log(formData)
+      mutationChangeAvatar.mutate(formData, {
+        onSuccess: () => {
+          toast.success('Đổi avatar thành công!')
+        },
+        onError: () => {
+          console.log('er')
+        }
+      })
+    }
+  }
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    mutation.mutate(formState, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['user', 3] })
+        setFormState(initialFromState)
+        toast.success('Thành công!')
+        onClose()
+      },
+      onError: () => {
+        toast.warn('Lỗi!')
+      }
+    })
+  }
   return (
     <div
       id='authentication-modal'
       tabIndex={-1}
       aria-hidden='true'
       onClick={handleModalClick}
-      className={` ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-        } fixed bg-[#02020246] dark:bg-[#ffffff46] top-0 left-0 right-0 z-50 w-[100vw] p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[100vh] transition-all`}
+      className={` ${
+        isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+      } fixed bg-[#02020246] dark:bg-[#ffffff46] top-0 left-0 right-0 z-50 w-[100vw] p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[100vh] transition-all`}
     >
       <div
         ref={modalRef}
@@ -46,72 +104,98 @@ const Modal = ({ isOpen, onClose, data }: any) => {
             <span className='sr-only'>Close modal</span>
           </button>
           <div className='px-6 py-6 lg:px-8'>
-            <h3 className='mb-4 text-xl font-medium text-gray-900 dark:text-white'>Xem bình luận</h3>
-            <div className='w-[300px] h-[300px] mx-auto overflow-hidden rounded-full'>
+            <h3 className='mb-4 text-xl font-medium text-gray-900 dark:text-white'>Sửa tài khoản</h3>
+            <div className='relative mb-4 group w-[200px] h-[200px] mx-auto overflow-hidden rounded-full'>
               <img src={data?.avatar[0]} alt='avatar' />
             </div>
-            <form className='space-y-6' action='#' autoComplete='false'>
+            <form className='space-y-6' action='#' autoComplete='false' onSubmit={(e) => handleSubmit(e)}>
+              <div className='flex items-center justify-center w-full'>
+                <label
+                  htmlFor='dropzone-file'
+                  className='flex flex-col items-center justify-center w-full h-40 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600'
+                >
+                  <div className='flex flex-col items-center justify-center pt-5 pb-6'>
+                    <svg
+                      className='w-8 h-8 mb-4 text-gray-500 dark:text-gray-400'
+                      aria-hidden='true'
+                      xmlns='http://www.w3.org/2000/svg'
+                      fill='none'
+                      viewBox='0 0 20 16'
+                    >
+                      <path
+                        stroke='currentColor'
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2}
+                        d='M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2'
+                      />
+                    </svg>
+                    <p className='mb-2 text-sm text-gray-500 dark:text-gray-400'>
+                      <span className='font-semibold'>Click to change</span> or drag and drop
+                    </p>
+                    <p className='text-xs text-gray-500 dark:text-gray-400'>SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
+                  </div>
+                  <input
+                    id='dropzone-file'
+                    type='file'
+                    accept='image/*'
+                    className='hidden'
+                    onChange={(e) => {
+                      handleAvatar(e)
+                    }}
+                  />
+                </label>
+              </div>
+
               <div>
-                <label htmlFor='title' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
+                <label htmlFor='email' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
                   Email
                 </label>
                 <input
                   type='text'
-                  name='title'
-                  id='title'
-                  disabled
+                  name='email'
+                  id='email'
                   className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white'
-                  placeholder='Tiêu đề'
-                  value={data?.email}
+                  placeholder='Email'
+                  disabled
+                  value={formState?.email !== '' ? formState?.email : data?.email}
+                  onChange={handleChange('email')}
                 />
               </div>
               <div>
-                <label htmlFor='name1' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
+                <label htmlFor='name' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
                   Tên
                 </label>
                 <input
                   type='text'
-                  name='name1'
-                  id='name1'
-                  disabled
+                  name='name'
+                  id='name'
                   className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white'
-                  placeholder='Không có tên'
-                  value={data?.name}
+                  placeholder='Tên'
+                  value={formState?.name !== '' ? formState?.name : data?.name}
+                  onChange={handleChange('name')}
                 />
               </div>
               <div>
-                <label htmlFor='link' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
-                  Số điện thoại
-                </label>
-                <input
-                  type='text'
-                  name='link'
-                  id='link'
-                  className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white'
-                  placeholder='Không có số điện thoại'
-                  disabled
-                  value={data?.phone}
-                />
-              </div>
-              <div>
-                <label htmlFor='link' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
+                <label htmlFor='username' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
                   User name
                 </label>
                 <input
                   type='text'
-                  name='link'
-                  id='link'
+                  name='username'
+                  id='username'
+                  disabled
                   className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white'
                   placeholder='Không có username'
-                  disabled
-                  value={data?.username}
+                  value={formState?.username !== '' ? formState?.username : data?.username}
+                  onChange={handleChange('username')}
                 />
               </div>
               <button
                 type='submit'
                 className='w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
               >
-                {/* {mutation.isLoading ? (
+                {mutation.isLoading ? (
                   <div>
                     <svg
                       aria-hidden='true'
@@ -134,8 +218,7 @@ const Modal = ({ isOpen, onClose, data }: any) => {
                   </div>
                 ) : (
                   'Sửa'
-                )} */}
-                sửa
+                )}
               </button>
             </form>
           </div>

@@ -15,8 +15,9 @@ const CreateModal = ({ isOpen, onClose, data }: any) => {
       tabIndex={-1}
       aria-hidden='true'
       onClick={handleModalClick}
-      className={` ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-        } fixed bg-[#02020246] dark:bg-[#ffffff46] top-0 left-0 right-0 z-50 w-[100vw] p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[100vh] transition-all`}
+      className={` ${
+        isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+      } fixed bg-[#02020246] dark:bg-[#ffffff46] top-0 left-0 right-0 z-50 w-[100vw] p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[100vh] transition-all`}
     >
       <div
         ref={modalRef}
@@ -57,7 +58,6 @@ const CreateModal = ({ isOpen, onClose, data }: any) => {
                   type='text'
                   name='title'
                   id='title'
-                  disabled
                   className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white'
                   placeholder='Tiêu đề'
                   value={data?.email}
@@ -71,7 +71,6 @@ const CreateModal = ({ isOpen, onClose, data }: any) => {
                   type='number'
                   name='price'
                   id='price'
-                  disabled
                   className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white'
                   placeholder='Không ghi địa chỉ'
                   value={data?.address}
@@ -87,7 +86,6 @@ const CreateModal = ({ isOpen, onClose, data }: any) => {
                   id='link'
                   className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white'
                   placeholder='link'
-                  disabled
                   value={data?.phone}
                 />
               </div>
@@ -102,7 +100,6 @@ const CreateModal = ({ isOpen, onClose, data }: any) => {
                       value={data?.content}
                       className='block min-h-max w-full px-4 py-4  text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
                       placeholder='Nội dung'
-                      disabled
                     />
                   </div>
                 </div>

@@ -21,7 +21,7 @@ const Users = () => {
   const [isModalOpenCreate, setModalOpenCreate] = useState(false)
 
   const searchMutation = useMutation({
-    mutationFn: (username: string) => searchUser(username)
+    mutationFn: (email: string) => searchUser(email)
   })
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteStaff(id)
@@ -32,7 +32,6 @@ const Users = () => {
       onSuccess: () => {
         toast.success('Đã xoá!')
         queryClient.invalidateQueries({ queryKey: ['user', 3] })
-
       },
       onError: () => {
         toast.warn('Lỗi!')
@@ -61,8 +60,8 @@ const Users = () => {
         setStaff(data.data)
         setCurrentPage(1)
       },
-      onError: (error: any) => {
-        toast.warn(error.response.data)
+      onError: () => {
+        toast.warn('Lỗi!')
       }
     })
   }
@@ -181,9 +180,6 @@ const Users = () => {
                       User Name
                     </th>
                     <th scope='col' className='px-6 py-3'>
-                      Phone
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
                       Hành động
                     </th>
                   </tr>
@@ -219,12 +215,6 @@ const Users = () => {
                             className='px-6 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white'
                           >
                             {item.username}
-                          </th>
-                          <th
-                            scope='row'
-                            className='px-6 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white'
-                          >
-                            {item.phone}
                           </th>
                           <th
                             scope='row'

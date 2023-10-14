@@ -92,7 +92,7 @@ const Contact = () => {
       </div>
       <div className='flex justify-between mb-3 mobile:flex-col tablet:flex-col'>
         <div className='mb-2 flex items-center'>
-          <span className='my-4 font-bold dark:text-white'>Số lượng bình luận: {dataConfig?.data.count || 0}</span>
+          <span className='my-4 font-bold dark:text-white'>Số lượng liên hệ: {dataConfig?.data.count || 0}</span>
         </div>
         <div className='w-[50%] mobile:w-full'>
           <form onSubmit={(e) => handleSearch(e)}>

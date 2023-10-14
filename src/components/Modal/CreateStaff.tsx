@@ -45,8 +45,8 @@ const CreateStaff = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
         toast.success('Thành công!')
         onClose()
       },
-      onError: () => {
-        toast.warn('Lỗi!')
+      onError: (error: any) => {
+        toast.warn(error?.response.data.errMessage)
       }
     })
   }
@@ -56,8 +56,9 @@ const CreateStaff = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
       tabIndex={-1}
       aria-hidden='true'
       onClick={handleModalClick}
-      className={` ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-        } fixed bg-[#02020246] dark:bg-[#ffffff46] top-0 left-0 right-0 z-50 w-[100vw] p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[100vh] transition-all`}
+      className={` ${
+        isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+      } fixed bg-[#02020246] dark:bg-[#ffffff46] top-0 left-0 right-0 z-50 w-[100vw] p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[100vh] transition-all`}
     >
       <div
         ref={modalRef}
