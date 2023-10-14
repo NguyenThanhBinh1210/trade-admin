@@ -1,31 +1,28 @@
 import { useContext, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { toast } from 'react-toastify'
-import { getAllComment, searchComment } from '~/apis/product.api'
+import { deleteComment, getAllComment, searchComment } from '~/apis/product.api'
 import CreateModal from '~/components/Modal/CreateModal'
 import { AppContext } from '~/contexts/app.context'
-import { FormatNumber } from '~/hooks/useFormatNumber'
 
 const Comment = () => {
   const { profile } = useContext(AppContext)
   const [data, setData] = useState<any>([])
   const [showComment, setShowComment] = useState()
   const [isModalOpen, setModalOpen] = useState(false)
-  const [queryConfig, setQueryConfig] = useState({
-    page: 1
-  })
-
   const { data: dataConfig, isLoading: isLoadingOption } = useQuery({
     queryKey: ['comments', 2],
     queryFn: () => {
-      return getAllComment(queryConfig)
+      return getAllComment({
+        page: 1
+      })
     },
     onSuccess: (data) => {
       setData(data.data.comments)
     },
     cacheTime: 120000
   })
-  const itemsPerPage = 4
+  const itemsPerPage = 8
   const [currentPage, setCurrentPage] = useState(1)
   const totalPages = Math.ceil(data.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
@@ -34,9 +31,22 @@ const Comment = () => {
   const searchMutation = useMutation({
     mutationFn: (title: string) => searchComment(title)
   })
-  // const deleteMutation = useMutation({
-  //   mutationFn: (title: string) => deleteComment(title)
-  // })
+  const queryClient = useQueryClient()
+
+  const deleteMutation = useMutation({
+    mutationFn: (body: any) => deleteComment(body),
+    onError: () => {
+      toast.warn('Error')
+    },
+    onSuccess: () => {
+      toast.success('Đã xoá')
+      queryClient.invalidateQueries({ queryKey: ['comments', 2] })
+    }
+  })
+  const handleDelete = (id: string) => {
+    const body = [id]
+    deleteMutation.mutate(body)
+  }
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page)
@@ -51,7 +61,7 @@ const Comment = () => {
         setData(data.data)
         setCurrentPage(1)
       },
-      onError: (error: any) => {
+      onError: (error: unknown) => {
         // toast.warn(error.response.data)
         console.log(error)
       }
@@ -60,7 +70,7 @@ const Comment = () => {
   return (
     <div className='p-5 flex flex-col h-full'>
       <div className='flex justify-between items-center mb-3'>
-        <h1 className='mb-3  text-2xl font-bold dark:text-white'>Danh sách option</h1>
+        <h1 className='mb-3  text-2xl font-bold dark:text-white'>Danh sách bình luận</h1>
         <div className='flex items-center space-x-4'>
           <div className='relative w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600'>
             <svg
@@ -227,7 +237,7 @@ const Comment = () => {
                             </button>
                             <button
                               type='button'
-                              // onClick={(e) => handleDelete(e, item._id)}
+                              onClick={() => handleDelete(item._id)}
                               className='text-white bg-red-700 hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-2 py-1 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900'
                             >
                               Xoá
