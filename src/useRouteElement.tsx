@@ -42,7 +42,7 @@ const useRouteElements = () => {
           path: '/',
           index: true,
           element: (
-            <AdminLayout>
+            <AdminLayout title='Dashboard'>
               <div>kk</div>
             </AdminLayout>
           )
@@ -50,7 +50,7 @@ const useRouteElements = () => {
         {
           path: '/comment',
           element: (
-            <AdminLayout>
+            <AdminLayout title='Danh sách bình luận'>
               <Comment />
             </AdminLayout>
           )
@@ -58,7 +58,7 @@ const useRouteElements = () => {
         {
           path: '/contact',
           element: (
-            <AdminLayout>
+            <AdminLayout title='Danh sách liên hệ'>
               <Contact />
             </AdminLayout>
           )
@@ -66,7 +66,7 @@ const useRouteElements = () => {
         {
           path: '/user',
           element: (
-            <AdminLayout>
+            <AdminLayout title='Danh sách tài khoản'>
               <Users />
             </AdminLayout>
           )
