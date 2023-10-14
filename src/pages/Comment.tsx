@@ -8,7 +8,7 @@ import { AppContext } from '~/contexts/app.context'
 const Comment = () => {
   const { profile } = useContext(AppContext)
   const [data, setData] = useState<any>([])
-  const [showComment, setShowComment] = useState()
+  const [showComment, setShowComment] = useState(null)
   const [isModalOpen, setModalOpen] = useState(false)
   const { data: dataConfig, isLoading: isLoadingOption } = useQuery({
     queryKey: ['comments', 2],

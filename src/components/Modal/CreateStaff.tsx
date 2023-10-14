@@ -1,13 +1,55 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
+import { useMutation, useQueryClient } from 'react-query'
+import { toast } from 'react-toastify'
+import { createStaff } from '~/apis/product.api'
 
-const Modal = ({ isOpen, onClose, data }: any) => {
+export interface Staff {
+  name: string
+  username: string
+  email: string
+  password: string
+  isStaff: boolean
+  isAdmin: boolean
+}
+const CreateStaff = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const modalRef = useRef<HTMLDivElement>(null)
+
   const handleModalClick = (e: React.MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
       onClose()
     }
   }
 
+  const initialFromState: Staff = {
+    name: '',
+    username: '',
+    email: '',
+    password: '',
+    isStaff: true,
+    isAdmin: false
+  }
+  const queryClient = useQueryClient()
+  const mutation = useMutation((body: Staff) => {
+    return createStaff(body)
+  })
+  const [formState, setFormState] = useState(initialFromState)
+  const handleChange = (name: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFormState((prev) => ({ ...prev, [name]: event.target.value }))
+  }
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    mutation.mutate(formState, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['user', 3] })
+        setFormState(initialFromState)
+        toast.success('Thành công!')
+        onClose()
+      },
+      onError: () => {
+        toast.warn('Lỗi!')
+      }
+    })
+  }
   return (
     <div
       id='authentication-modal'
@@ -46,72 +88,69 @@ const Modal = ({ isOpen, onClose, data }: any) => {
             <span className='sr-only'>Close modal</span>
           </button>
           <div className='px-6 py-6 lg:px-8'>
-            <h3 className='mb-4 text-xl font-medium text-gray-900 dark:text-white'>Xem bình luận</h3>
-            <div className='w-[300px] h-[300px] mx-auto overflow-hidden rounded-full'>
-              <img src={data?.avatar[0]} alt='avatar' />
-            </div>
-            <form className='space-y-6' action='#' autoComplete='false'>
+            <h3 className='mb-4 text-xl font-medium text-gray-900 dark:text-white'>Tạo nhân viên</h3>
+            <form className='space-y-6' action='#' autoComplete='false' onSubmit={(e) => handleSubmit(e)}>
               <div>
-                <label htmlFor='title' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
+                <label htmlFor='email' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
                   Email
                 </label>
                 <input
                   type='text'
-                  name='title'
-                  id='title'
-                  disabled
+                  name='email'
+                  id='email'
+                  onChange={handleChange('email')}
                   className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white'
-                  placeholder='Tiêu đề'
-                  value={data?.email}
+                  placeholder='Email'
+                  value={formState?.email}
                 />
               </div>
               <div>
-                <label htmlFor='name1' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
+                <label htmlFor='name' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
                   Tên
                 </label>
                 <input
                   type='text'
-                  name='name1'
-                  id='name1'
-                  disabled
+                  name='name'
+                  id='name'
                   className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white'
-                  placeholder='Không có tên'
-                  value={data?.name}
+                  placeholder='Tên'
+                  value={formState?.name}
+                  onChange={handleChange('name')}
                 />
               </div>
               <div>
-                <label htmlFor='link' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
-                  Số điện thoại
+                <label htmlFor='username' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
+                  Tài khoản
                 </label>
                 <input
                   type='text'
-                  name='link'
-                  id='link'
+                  name='username'
+                  id='username'
                   className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white'
-                  placeholder='Không có số điện thoại'
-                  disabled
-                  value={data?.phone}
+                  placeholder='Tài khoản'
+                  value={formState?.username}
+                  onChange={handleChange('username')}
                 />
               </div>
               <div>
-                <label htmlFor='link' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
-                  User name
+                <label htmlFor='password' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
+                  Mật khẩu
                 </label>
                 <input
                   type='text'
-                  name='link'
-                  id='link'
+                  name='password'
+                  id='password'
                   className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white'
-                  placeholder='Không có username'
-                  disabled
-                  value={data?.username}
+                  placeholder='Mật khẩu'
+                  value={formState?.password}
+                  onChange={handleChange('password')}
                 />
               </div>
               <button
                 type='submit'
                 className='w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
               >
-                {/* {mutation.isLoading ? (
+                {mutation.isLoading ? (
                   <div>
                     <svg
                       aria-hidden='true'
@@ -133,9 +172,8 @@ const Modal = ({ isOpen, onClose, data }: any) => {
                     Đang chờ...
                   </div>
                 ) : (
-                  'Sửa'
-                )} */}
-                sửa
+                  'Tạo'
+                )}
               </button>
             </form>
           </div>
@@ -145,4 +183,4 @@ const Modal = ({ isOpen, onClose, data }: any) => {
   )
 }
 
-export default Modal
+export default CreateStaff

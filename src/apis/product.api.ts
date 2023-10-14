@@ -1,3 +1,4 @@
+import { Staff } from '~/components/Modal/CreateStaff'
 import http from '~/utils/http'
 
 export const getProduct = (params?: unknown) => http.get('/product/get-all', { params })
@@ -20,7 +21,9 @@ export const deleteComment = (body: string[]) =>
       id: body
     }
   })
+export const deleteStaff = (id: string) => http.delete(`v1/user/${id}`)
 export const createKey = (body: { date: number; username: string }) => http.post('key/create', body)
+export const createStaff = (body: Staff) => http.post('v1/user/register-staff', body)
 export const getAllComment = (params?: unknown) => http.get('/v1/comment/get-all-comment', { params })
 export const getAllContact = (params?: unknown) => http.get('/v1/contact/get-all-contact', { params })
 export const updateConfig = (body: { title: string; price: number; url_tele: string; content: string[] }) =>

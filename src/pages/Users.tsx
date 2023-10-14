@@ -1,8 +1,9 @@
 import React, { useContext, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { toast } from 'react-toastify'
-import { getAllStaff, searchUser } from '~/apis/product.api'
+import { deleteStaff, getAllStaff, searchUser } from '~/apis/product.api'
 import Modal from '~/components/Modal'
+import CreateStaff from '~/components/Modal/CreateStaff'
 import { AppContext } from '~/contexts/app.context'
 
 const Users = () => {
@@ -17,12 +18,27 @@ const Users = () => {
   const currentData = staff?.slice(startIndex, endIndex)
   const [showComment, setShowComment] = useState()
   const [isModalOpen, setModalOpen] = useState(false)
-
+  const [isModalOpenCreate, setModalOpenCreate] = useState(false)
 
   const searchMutation = useMutation({
     mutationFn: (username: string) => searchUser(username)
   })
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteStaff(id)
+  })
+  const queryClient = useQueryClient()
+  const handleDeleteStaff = (id: string) => {
+    deleteMutation.mutate(id, {
+      onSuccess: () => {
+        toast.success('Đã xoá!')
+        queryClient.invalidateQueries({ queryKey: ['user', 3] })
 
+      },
+      onError: () => {
+        toast.warn('Lỗi!')
+      }
+    })
+  }
   const { isLoading: isLoadingUser } = useQuery({
     queryKey: ['user', 3],
     queryFn: () => {
@@ -77,6 +93,12 @@ const Users = () => {
       <div className='flex justify-between mb-3 mobile:flex-col tablet:flex-col'>
         <div className='mb-2 flex items-center'>
           <span className='my-4 font-bold dark:text-white'>Số lượng tài khoản: {staff.length || 0}</span>
+          <button
+            onClick={() => setModalOpenCreate(true)}
+            className='disabled:bg-opacity-70 ml-4 h-[50px] w-max text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-2xl text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
+          >
+            Tạo nhân viên
+          </button>
         </div>
         <div className='w-[50%] mobile:w-full'>
           <form onSubmit={(e) => handleSearch(e)}>
@@ -220,7 +242,7 @@ const Users = () => {
                             </button>
                             <button
                               type='button'
-                              // onClick={() => handleDelete(item._id)}
+                              onClick={() => handleDeleteStaff(item._id)}
                               className='text-white bg-red-700 hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-2 py-1 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900'
                             >
                               Xoá
@@ -297,6 +319,7 @@ const Users = () => {
         )}
       </div>
       <Modal data={showComment} isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
+      <CreateStaff isOpen={isModalOpenCreate} onClose={() => setModalOpenCreate(false)} />
     </div>
   )
 }
