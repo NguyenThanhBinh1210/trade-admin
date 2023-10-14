@@ -1,35 +1,59 @@
 import { useContext, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { toast } from 'react-toastify'
-import { getAllConfig, searchConfig } from '~/apis/product.api'
+import { getAllComment, searchComment } from '~/apis/product.api'
 import CreateModal from '~/components/Modal/CreateModal'
 import { AppContext } from '~/contexts/app.context'
 import { FormatNumber } from '~/hooks/useFormatNumber'
 
 const Comment = () => {
   const { profile } = useContext(AppContext)
-  const [data, setData] = useState(null)
+  const [data, setData] = useState<any>([])
+  const [showComment, setShowComment] = useState()
   const [isModalOpen, setModalOpen] = useState(false)
+  const [queryConfig, setQueryConfig] = useState({
+    page: 1
+  })
 
   const { data: dataConfig, isLoading: isLoadingOption } = useQuery({
-    queryKey: ['options', 2],
+    queryKey: ['comments', 2],
     queryFn: () => {
-      return getAllConfig()
+      return getAllComment(queryConfig)
+    },
+    onSuccess: (data) => {
+      setData(data.data.comments)
     },
     cacheTime: 120000
   })
+  const itemsPerPage = 4
+  const [currentPage, setCurrentPage] = useState(1)
+  const totalPages = Math.ceil(data.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const currentData = data?.slice(startIndex, endIndex)
   const searchMutation = useMutation({
-    mutationFn: (title: string) => searchConfig(title)
+    mutationFn: (title: string) => searchComment(title)
   })
-  const handleSearch = (e: any, title: string) => {
+  // const deleteMutation = useMutation({
+  //   mutationFn: (title: string) => deleteComment(title)
+  // })
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page)
+    }
+  }
+  const [search, setSearch] = useState<string>('')
+
+  const handleSearch = (e: any) => {
     e.preventDefault()
-    searchMutation.mutate(title, {
+    searchMutation.mutate(search, {
       onSuccess: (data) => {
-        setData(data.data[0])
-        setModalOpen(true)
+        setData(data.data)
+        setCurrentPage(1)
       },
       onError: (error: any) => {
-        toast.warn(error.response.data)
+        // toast.warn(error.response.data)
+        console.log(error)
       }
     })
   }
@@ -59,7 +83,47 @@ const Comment = () => {
       </div>
       <div className='flex justify-between mb-3 mobile:flex-col tablet:flex-col'>
         <div className='mb-2 flex items-center'>
-          <span className='my-4 font-bold dark:text-white'>Số lượng option: {dataConfig?.data.length || 0}</span>
+          <span className='my-4 font-bold dark:text-white'>Số lượng bình luận: {dataConfig?.data.count || 0}</span>
+        </div>
+        <div className='w-[50%] mobile:w-full'>
+          <form onSubmit={(e) => handleSearch(e)}>
+            <label htmlFor='default-search' className='mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white'>
+              Search
+            </label>
+            <div className='relative'>
+              <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
+                <svg
+                  className='w-4 h-4 text-gray-500 dark:text-gray-400'
+                  aria-hidden='true'
+                  xmlns='http://www.w3.org/2000/svg'
+                  fill='none'
+                  viewBox='0 0 20 20'
+                >
+                  <path
+                    stroke='currentColor'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z'
+                  />
+                </svg>
+              </div>
+              <input
+                type='search'
+                id='default-search'
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className='block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
+                placeholder='Search...'
+              />
+              <button
+                type='submit'
+                className='text-white absolute right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
+              >
+                Search
+              </button>
+            </div>
+          </form>
         </div>
       </div>
       <div className='flex flex-col gap-[30px] flex-1'>
@@ -93,22 +157,25 @@ const Comment = () => {
                       STT
                     </th>
                     <th scope='col' className='px-6 py-3'>
-                      Tên
+                      Email
                     </th>
                     <th scope='col' className='px-6 py-3'>
-                      Giá
+                      Địa chỉ
                     </th>
                     <th scope='col' className='px-6 py-3'>
-                      Link
+                      Nội dung
+                    </th>
+                    <th scope='col' className='px-6 py-3'>
+                      Số điện thoại
                     </th>
                     <th scope='col' className='px-6 py-3'>
                       Action
                     </th>
                   </tr>
                 </thead>
-                {dataConfig?.data !== 0 && (
+                {currentData.length !== 0 && (
                   <tbody>
-                    {dataConfig?.data.map((item: any, idx: number) => {
+                    {currentData?.map((item: any, idx: number) => {
                       return (
                         <tr
                           key={item._id}
@@ -124,21 +191,25 @@ const Comment = () => {
                             scope='row'
                             className='px-6 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white'
                           >
-                            {item.title}
+                            {item?.email}
                           </th>
                           <th
                             scope='row'
                             className='px-6 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white'
                           >
-                            {FormatNumber(item.price)}đ
+                            {item?.address}
+                          </th>
+                          <th
+                            scope='row'
+                            className='px-6 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white'
+                          >
+                            <div className='max-w-[180px] whitespace-normal line-clamp-1'>{item?.content}</div>
                           </th>
                           <th
                             scope='row'
                             className='px-6 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white mobile:w-[200px]'
                           >
-                            <a href={item.url_tele} target='_blank' className='text-blue-500' rel='noreferrer'>
-                              {item.url_tele}
-                            </a>
+                            {item?.phone}
                           </th>
                           <th
                             scope='row'
@@ -146,10 +217,20 @@ const Comment = () => {
                           >
                             <button
                               type='button'
-                              onClick={(e) => handleSearch(e, item.title)}
+                              onClick={() => {
+                                setShowComment(item)
+                                setModalOpen(true)
+                              }}
                               className='text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-2 py-1 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-900'
                             >
-                              Sửa
+                              Xem
+                            </button>
+                            <button
+                              type='button'
+                              // onClick={(e) => handleDelete(e, item._id)}
+                              className='text-white bg-red-700 hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-2 py-1 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900'
+                            >
+                              Xoá
                             </button>
                           </th>
                         </tr>
@@ -159,10 +240,70 @@ const Comment = () => {
                 )}
               </table>
             </div>
+            <nav aria-label='Page navigation example' className='mx-auto'>
+              <ul className='flex items-center -space-x-px h-10 text-base'>
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  className='flex items-center justify-center px-4 h-10 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white'
+                >
+                  <span className='sr-only'>Previous</span>
+                  <svg
+                    className='w-3 h-3'
+                    aria-hidden='true'
+                    xmlns='http://www.w3.org/2000/svg'
+                    fill='none'
+                    viewBox='0 0 6 10'
+                  >
+                    <path
+                      stroke='currentColor'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M5 1 1 5l4 4'
+                    />
+                  </svg>
+                </button>
+                {Array.from({ length: totalPages }, (_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handlePageChange(index + 1)}
+                    className={
+                      currentPage === index + 1
+                        ? 'z-10 flex items-center justify-center px-4 h-10 leading-tight text-blue-600 border border-blue-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white'
+                        : 'flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white'
+                    }
+                  >
+                    {index + 1}
+                  </button>
+                ))}
+
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  className='flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white'
+                >
+                  <span className='sr-only'>Next</span>
+                  <svg
+                    className='w-3 h-3'
+                    aria-hidden='true'
+                    xmlns='http://www.w3.org/2000/svg'
+                    fill='none'
+                    viewBox='0 0 6 10'
+                  >
+                    <path
+                      stroke='currentColor'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='m1 9 4-4-4-4'
+                    />
+                  </svg>
+                </button>
+              </ul>
+            </nav>
           </>
         )}
       </div>
-      <CreateModal data={data} isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
+      <CreateModal data={showComment} isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
     </div>
   )
 }

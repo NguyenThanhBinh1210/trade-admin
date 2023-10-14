@@ -51,7 +51,7 @@ const useRouteElements = () => {
           path: '/comment',
           element: (
             <AdminLayout>
-              <Contact />
+              <Comment />
             </AdminLayout>
           )
         },
@@ -59,7 +59,7 @@ const useRouteElements = () => {
           path: '/contact',
           element: (
             <AdminLayout>
-              <Comment />
+              <Contact />
             </AdminLayout>
           )
         },
