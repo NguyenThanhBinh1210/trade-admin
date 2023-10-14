@@ -11,7 +11,7 @@ class Http {
       baseURL: 'https://api-kinhdoanh.onrender.com/api/',
       timeout: 10000,
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'multipart/form-data', 
       }
     })
     this.instance.interceptors.request.use(
