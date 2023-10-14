@@ -179,7 +179,7 @@ const Comment = () => {
                       Số điện thoại
                     </th>
                     <th scope='col' className='px-6 py-3'>
-                      Action
+                      Hành động
                     </th>
                   </tr>
                 </thead>

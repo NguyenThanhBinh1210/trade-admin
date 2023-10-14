@@ -25,4 +25,4 @@ export const getAllComment = (params?: unknown) => http.get('/v1/comment/get-all
 export const getAllContact = (params?: unknown) => http.get('/v1/contact/get-all-contact', { params })
 export const updateConfig = (body: { title: string; price: number; url_tele: string; content: string[] }) =>
   http.post('/config/update', body)
-export const getAllUser = () => http.get('user/auth/info')
+export const getAllStaff = () => http.get('v1/user/get-all-staff')

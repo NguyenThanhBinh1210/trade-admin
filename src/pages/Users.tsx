@@ -1,19 +1,24 @@
 import React, { useContext, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { toast } from 'react-toastify'
-import { getAllUser, searchUser } from '~/apis/product.api'
+import { getAllStaff, searchUser } from '~/apis/product.api'
+import Modal from '~/components/Modal'
 import { AppContext } from '~/contexts/app.context'
 
 const Users = () => {
   const { profile } = useContext(AppContext)
-  const [keyState, setKeyState] = useState([])
+  const [staff, setStaff] = useState<any>([])
   const [search, setSearch] = useState<string>('')
   const itemsPerPage = 8
   const [currentPage, setCurrentPage] = useState(1)
-  const totalPages = Math.ceil(keyState?.length / itemsPerPage)
+  const totalPages = Math.ceil(staff?.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
-  const currentData = keyState?.slice(startIndex, endIndex)
+  const currentData = staff?.slice(startIndex, endIndex)
+  const [showComment, setShowComment] = useState()
+  const [isModalOpen, setModalOpen] = useState(false)
+
+
   const searchMutation = useMutation({
     mutationFn: (username: string) => searchUser(username)
   })
@@ -21,10 +26,10 @@ const Users = () => {
   const { isLoading: isLoadingUser } = useQuery({
     queryKey: ['user', 3],
     queryFn: () => {
-      return getAllUser()
+      return getAllStaff()
     },
     onSuccess: (data) => {
-      setKeyState(data.data)
+      setStaff(data.data.user)
     },
     cacheTime: 30000
   })
@@ -37,7 +42,7 @@ const Users = () => {
     e.preventDefault()
     searchMutation.mutate(search, {
       onSuccess: (data) => {
-        setKeyState(data.data)
+        setStaff(data.data)
         setCurrentPage(1)
       },
       onError: (error: any) => {
@@ -71,7 +76,7 @@ const Users = () => {
       </div>
       <div className='flex justify-between mb-3 mobile:flex-col tablet:flex-col'>
         <div className='mb-2 flex items-center'>
-          <span className='my-4 font-bold dark:text-white'>Số lượng tài khoản: {keyState.length || 0}</span>
+          <span className='my-4 font-bold dark:text-white'>Số lượng tài khoản: {staff.length || 0}</span>
         </div>
         <div className='w-[50%] mobile:w-full'>
           <form onSubmit={(e) => handleSearch(e)}>
@@ -145,14 +150,23 @@ const Users = () => {
                       STT
                     </th>
                     <th scope='col' className='px-6 py-3'>
+                      Email
+                    </th>
+                    <th scope='col' className='px-6 py-3'>
                       Name
                     </th>
                     <th scope='col' className='px-6 py-3'>
-                      Username
+                      User Name
+                    </th>
+                    <th scope='col' className='px-6 py-3'>
+                      Phone
+                    </th>
+                    <th scope='col' className='px-6 py-3'>
+                      Hành động
                     </th>
                   </tr>
                 </thead>
-                {keyState.length !== 0 && (
+                {staff.length !== 0 && (
                   <tbody>
                     {currentData.map((item: any, idx: number) => {
                       return (
@@ -170,6 +184,12 @@ const Users = () => {
                             scope='row'
                             className='px-6 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white'
                           >
+                            {item.email}
+                          </th>
+                          <th
+                            scope='row'
+                            className='px-6 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white'
+                          >
                             {item.name}
                           </th>
                           <th
@@ -177,6 +197,34 @@ const Users = () => {
                             className='px-6 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white'
                           >
                             {item.username}
+                          </th>
+                          <th
+                            scope='row'
+                            className='px-6 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white'
+                          >
+                            {item.phone}
+                          </th>
+                          <th
+                            scope='row'
+                            className='px-6 py-3 w-[200px] flex items-center gap-x-2 font-medium text-gray-900 whitespace-nowrap dark:text-white'
+                          >
+                            <button
+                              type='button'
+                              onClick={() => {
+                                setShowComment(item)
+                                setModalOpen(true)
+                              }}
+                              className='text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-2 py-1 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-900'
+                            >
+                              Xem
+                            </button>
+                            <button
+                              type='button'
+                              // onClick={() => handleDelete(item._id)}
+                              className='text-white bg-red-700 hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-2 py-1 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900'
+                            >
+                              Xoá
+                            </button>
                           </th>
                         </tr>
                       )
@@ -248,8 +296,7 @@ const Users = () => {
           </>
         )}
       </div>
-      {/* {searchMutation.isLoading || deleteMutation.isLoading || toggleMutation.isLoading ? (<Loading></Loading>) : null}
-      <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)} /> */}
+      <Modal data={showComment} isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
     </div>
   )
 }

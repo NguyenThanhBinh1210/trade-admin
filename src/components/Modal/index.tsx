@@ -1,45 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useRef, useState } from 'react'
-import { useMutation, useQueryClient } from 'react-query'
-import { createKey } from '~/apis/product.api'
+import React, { useRef } from 'react'
 
-const Modal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+const Modal = ({ isOpen, onClose, data }: any) => {
   const modalRef = useRef<HTMLDivElement>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [username, setUsername] = useState<string>('')
-  const [day, setDay] = useState<number | null>(null)
   const handleModalClick = (e: React.MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
       onClose()
     }
   }
-  const mutation = useMutation((body: any) => {
-    return createKey(body)
-  })
-  const queryClient = useQueryClient()
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const body = { date: day, username: username }
-    mutation.mutate(body, {
-      onSuccess: () => {
-        setUsername('')
-        queryClient.invalidateQueries({ queryKey: ['key', 1] })
-        onClose()
-      },
-      onError: (data: any) => {
-        setError(data.response.data)
-      }
-    })
-  }
+
   return (
     <div
       id='authentication-modal'
       tabIndex={-1}
       aria-hidden='true'
       onClick={handleModalClick}
-      className={` ${
-        isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-      } fixed bg-[#02020246] dark:bg-[#ffffff46] top-0 left-0 right-0 z-50 w-[100vw] p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[100vh] transition-all`}
+      className={` ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+        } fixed bg-[#02020246] dark:bg-[#ffffff46] top-0 left-0 right-0 z-50 w-[100vw] p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[100vh] transition-all`}
     >
       <div
         ref={modalRef}
@@ -70,51 +47,68 @@ const Modal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
             <span className='sr-only'>Close modal</span>
           </button>
           <div className='px-6 py-6 lg:px-8'>
-            <h3 className='mb-4 text-xl font-medium text-gray-900 dark:text-white'>Tạo tài khoản</h3>
-            <form className='space-y-6' action='#' autoComplete='false' onSubmit={(e) => handleSubmit(e)}>
+            <h3 className='mb-4 text-xl font-medium text-gray-900 dark:text-white'>Xem nhân viên</h3>
+            <div className='w-[300px] h-[300px] mx-auto overflow-hidden rounded-full'>
+              <img src={data?.avatar[0]} alt='avatar' />
+            </div>
+            <form className='space-y-6' action='#' autoComplete='false'>
               <div>
-                <label htmlFor='expe' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
-                  Day
+                <label htmlFor='title' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
+                  Email
                 </label>
                 <input
                   type='text'
-                  name='expe'
-                  id='expe'
-                  value={day || 0}
-                  onChange={(e) => {
-                    setDay(Number(e.target.value))
-                    setError(null)
-                  }}
+                  name='title'
+                  id='title'
                   className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white'
-                  placeholder='2'
-                  required
+                  placeholder='Tiêu đề'
+                  value={data?.email}
                 />
               </div>
               <div>
-                <label htmlFor='username' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
-                  Username
+                <label htmlFor='name1' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
+                  Tên
                 </label>
                 <input
                   type='text'
-                  name='username'
-                  id='username'
-                  value={username}
-                  onChange={(e) => {
-                    setUsername(e.target.value)
-                    setError(null)
-                  }}
+                  name='name1'
+                  id='name1'
                   className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white'
-                  placeholder='name@company.com'
-                  required
+                  placeholder='Không có tên'
+                  value={data?.name}
                 />
               </div>
-              <div className='flex justify-between text-red-300 capitalize'>{error !== null && error}</div>
+              <div>
+                <label htmlFor='link' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
+                  Số điện thoại
+                </label>
+                <input
+                  type='text'
+                  name='link'
+                  id='link'
+                  className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white'
+                  placeholder='Không có số điện thoại'
+                  value={data?.phone}
+                />
+              </div>
+              <div>
+                <label htmlFor='link' className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'>
+                  User name
+                </label>
+                <input
+                  type='text'
+                  name='link'
+                  id='link'
+                  className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white'
+                  placeholder='Không có username'
+                  value={data?.username}
+                />
+              </div>
               <button
-                disabled={mutation.isLoading}
                 type='submit'
-                className='disabled:bg-opacity-70  w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
+                className='w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
               >
-                {mutation.isLoading ? (
+                {/* {mutation.isLoading ? (
                   <div>
                     <svg
                       aria-hidden='true'
@@ -136,8 +130,9 @@ const Modal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
                     Đang chờ...
                   </div>
                 ) : (
-                  'Tạo'
-                )}
+                  'Sửa'
+                )} */}
+                Sửa
               </button>
             </form>
           </div>
