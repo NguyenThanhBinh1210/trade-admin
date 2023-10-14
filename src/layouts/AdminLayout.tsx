@@ -17,7 +17,7 @@ const AdminLayout = ({ children, title }: Props) => {
         <div className={`w-[100%] p-5 tablet:h-[100vh] mobile:h-screen overflow-auto pb-10`}>
           <div className='flex justify-between items-center mb-3'>
             <h1 className='mb-3  text-2xl font-bold dark:text-white'>{title}</h1>
-            <div className='flex items-center space-x-4'>
+            <button onClick={() => setModalOpen(true)} className='flex items-center space-x-4'>
               <div className='relative w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600'>
                 <svg
                   className='absolute w-12 h-12 text-gray-400 -left-1'
@@ -32,10 +32,10 @@ const AdminLayout = ({ children, title }: Props) => {
                   ></path>
                 </svg>
               </div>
-              <button onClick={() => setModalOpen(true)} className='font-medium dark:text-white'>
+              <div className='font-medium dark:text-white'>
                 <div>{profile?.name}</div>
-              </button>
-            </div>
+              </div>
+            </button>
           </div>
           {children}
           <ProfileModal data={profile} isOpen={isModalOpen} onClose={() => setModalOpen(false)} />

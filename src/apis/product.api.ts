@@ -27,6 +27,7 @@ export const createStaff = (body: Staff) => http.post('v1/user/register-staff', 
 export const updateStaff = (id: string, body: any) => http.patch(`v1/user/${id}`, body)
 export const getAllComment = (params?: unknown) => http.get('/v1/comment/get-all-comment', { params })
 export const getAllContact = (params?: unknown) => http.get('/v1/contact/get-all-contact', { params })
+export const updateProfile = (body: any) => http.patch('/v1/user/update', body)
 export const updateConfig = (body: { title: string; price: number; url_tele: string; content: string[] }) =>
   http.post('/config/update', body)
 export const getAllStaff = () => http.get('v1/user/get-all-staff')

@@ -1,10 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { Staff } from './CreateStaff'
 import { useMutation, useQueryClient } from 'react-query'
-import { updateStaff } from '~/apis/product.api'
+import { updateProfile, updateStaff } from '~/apis/product.api'
 import { toast } from 'react-toastify'
+import { setProfileFromLS } from '~/utils/auth'
+import { AppContext } from '~/contexts/app.context'
 const ProfileModal = ({ isOpen, onClose, data }: any) => {
+  const { setProfile } = useContext(AppContext)
+
   const modalRef = useRef<HTMLDivElement>(null)
   const handleModalClick = (e: React.MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
@@ -21,7 +25,7 @@ const ProfileModal = ({ isOpen, onClose, data }: any) => {
   }
   const queryClient = useQueryClient()
   const mutation = useMutation((body: Staff) => {
-    return updateStaff(data._id, body)
+    return updateProfile(body)
   })
   const mutationChangeAvatar = useMutation((avatar) => {
     return updateStaff(data._id, { avatar })
@@ -57,6 +61,8 @@ const ProfileModal = ({ isOpen, onClose, data }: any) => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['user', 3] })
         setFormState(initialFromState)
+        setProfileFromLS(formState)
+        setProfile(formState)
         toast.success('Thành công!')
         onClose()
       },

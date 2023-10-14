@@ -33,10 +33,8 @@ class Http {
         const dataProfile = response
         const newUser = omit(dataProfile.data.user, ['password'])
         this.accessToken = response.data.token
-        // this.refreshToken = response.data.refresh_token
         setProfileFromLS(newUser as any)
         setAccesTokenToLS(this.accessToken)
-        // setRefreshTokenToLS(this.refreshToken)
       } else if (url === '/user/log-out') {
         // this.accessToken = ''
         // this.refreshToken = ''
