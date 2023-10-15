@@ -1,5 +1,6 @@
 import { Staff } from '~/components/Modal/CreateStaff'
 import http from '~/utils/http'
+import upload from '~/utils/upload'
 
 export const getProduct = (params?: unknown) => http.get('/product/get-all', { params })
 export const getAllKey = () => http.get('/key')
@@ -24,10 +25,11 @@ export const deleteComment = (body: string[]) =>
 export const deleteStaff = (id: string) => http.delete(`v1/user/${id}`)
 export const createKey = (body: { date: number; username: string }) => http.post('key/create', body)
 export const createStaff = (body: Staff) => http.post('v1/user/register-staff', body)
-export const updateStaff = (id: string, body: any) => http.patch(`v1/user/${id}`, body)
+export const updateStaff = (id: string, body: any) => upload.patch(`v1/user/${id}`, body)
 export const getAllComment = (params?: unknown) => http.get('/v1/comment/get-all-comment', { params })
 export const getAllContact = (params?: unknown) => http.get('/v1/contact/get-all-contact', { params })
-export const updateProfile = (body: any) => http.patch('/v1/user/update', body)
+export const updateProfile = (body: any) => upload.patch('/v1/user/update', body)
 export const updateConfig = (body: { title: string; price: number; url_tele: string; content: string[] }) =>
   http.post('/config/update', body)
 export const getAllStaff = () => http.get('v1/user/get-all-staff')
+export const repComment = (id: string, body: any) => http.post(`v1/comment/rep-comment`, body)

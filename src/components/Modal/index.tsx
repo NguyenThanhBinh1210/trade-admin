@@ -45,6 +45,7 @@ const Modal = ({ isOpen, onClose, data }: any) => {
           toast.success('Đổi avatar thành công!')
         },
         onError: () => {
+          toast.error('Lỗi khi cập nhật avatar!')
           console.log('er')
         }
       })

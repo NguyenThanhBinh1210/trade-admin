@@ -43,7 +43,7 @@ const useRouteElements = () => {
           index: true,
           element: (
             <AdminLayout title='Dashboard'>
-              <div>kk</div>
+              <Dashboard />
             </AdminLayout>
           )
         },
@@ -66,7 +66,7 @@ const useRouteElements = () => {
         {
           path: '/user',
           element: (
-            <AdminLayout title='Danh sách tài khoản'>
+            <AdminLayout title='Danh sách nhân viên'>
               <Users />
             </AdminLayout>
           )

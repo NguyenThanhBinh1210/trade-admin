@@ -71,7 +71,7 @@ const Users = () => {
           <span className='my-4 font-bold dark:text-white'>Số lượng tài khoản: {staff.length || 0}</span>
           <button
             onClick={() => setModalOpenCreate(true)}
-            className='disabled:bg-opacity-70 ml-4 h-[50px] w-max text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-2xl text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
+            className='disabled:bg-opacity-70 ml-4 h-[40px] w-max text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-2xl text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
           >
             Tạo nhân viên
           </button>
@@ -148,6 +148,9 @@ const Users = () => {
                       STT
                     </th>
                     <th scope='col' className='px-6 py-3'>
+                      Avatar
+                    </th>
+                    <th scope='col' className='px-6 py-3'>
                       Email
                     </th>
                     <th scope='col' className='px-6 py-3'>
@@ -174,6 +177,37 @@ const Users = () => {
                             className='w-[100px] px-6 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white'
                           >
                             {'#' + (idx + 1)}
+                          </th>
+                          <th
+                            scope='row'
+                            className='px-6 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white'
+                          >
+                            {item?.avatar[0] == null && (
+                              <div className='relative w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600'>
+                                <svg
+                                  className='absolute w-12 h-12 text-gray-400 -left-1'
+                                  fill='currentColor'
+                                  viewBox='0 0 20 20'
+                                  // style={{ borderRadius: '50%', width: '40px', height: '40px' }}
+                                  xmlns='http://www.w3.org/2000/svg'
+                                >
+                                  <path
+                                    fillRule='evenodd'
+                                    // style={{ borderRadius: '50%', width: '40px', height: '40px' }}
+                                    d='M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z'
+                                    clipRule='evenodd'
+                                  ></path>
+                                </svg>
+                              </div>
+                            )}
+                            {item?.avatar[0] && (
+                              <img
+                                className='aa'
+                                style={{ borderRadius: '50%', width: '40px', height: '40px' }}
+                                src={item.avatar}
+                                alt='avatar'
+                              />
+                            )}
                           </th>
                           <th
                             scope='row'

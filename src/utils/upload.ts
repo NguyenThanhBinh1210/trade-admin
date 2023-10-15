@@ -2,7 +2,7 @@ import axios, { type AxiosInstance } from 'axios'
 import omit from 'lodash/omit'
 import { getAccessTokenFromLS, setAccesTokenToLS, setProfileFromLS } from './auth'
 
-class Http {
+class Upload {
   instance: AxiosInstance
   private accessToken: string
   constructor() {
@@ -11,7 +11,7 @@ class Http {
       baseURL: 'https://api-kinhdoanh.onrender.com/api/',
       timeout: 10000,
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'multipart/form-data'
       }
     })
     this.instance.interceptors.request.use(
@@ -47,6 +47,6 @@ class Http {
   }
 }
 
-const http = new Http().instance
+const upload = new Upload().instance
 
-export default http
+export default upload

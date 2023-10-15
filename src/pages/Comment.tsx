@@ -3,13 +3,19 @@ import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { toast } from 'react-toastify'
 import { deleteComment, getAllComment, searchComment } from '~/apis/product.api'
 import CreateModal from '~/components/Modal/CreateModal'
+import RepModal from '~/components/Modal/RepModal'
 import { AppContext } from '~/contexts/app.context'
 
 const Comment = () => {
   const { profile } = useContext(AppContext)
   const [data, setData] = useState<any>([])
+
   const [showComment, setShowComment] = useState(null)
   const [isModalOpen, setModalOpen] = useState(false)
+
+  const [showComments, setShowComments] = useState(null)
+  const [isModalOpens, setModalOpens] = useState(false)
+
   const { data: dataConfig, isLoading: isLoadingOption } = useQuery({
     queryKey: ['comments', 2],
     queryFn: () => {
@@ -206,6 +212,16 @@ const Comment = () => {
                             <button
                               type='button'
                               onClick={() => {
+                                setShowComments(item)
+                                setModalOpens(true)
+                              }}
+                              className='text-white bg-green-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-2 py-1 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-900'
+                            >
+                              Trả lời
+                            </button>
+                            <button
+                              type='button'
+                              onClick={() => {
                                 setShowComment(item)
                                 setModalOpen(true)
                               }}
@@ -292,6 +308,7 @@ const Comment = () => {
         )}
       </div>
       <CreateModal data={showComment} isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
+      <RepModal data={showComments} isOpen={isModalOpens} onClose={() => setModalOpens(false)} />
     </>
   )
 }

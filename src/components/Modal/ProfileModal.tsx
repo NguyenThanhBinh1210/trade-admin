@@ -44,8 +44,7 @@ const ProfileModal = ({ isOpen, onClose, data }: any) => {
     const file = e.target.files[0]
     if (file) {
       formData.append('avatar', file)
-      console.log(formData)
-      mutationChangeAvatar.mutate(formData, {
+      mutationChangeAvatar.mutate(file, {
         onSuccess: () => {
           toast.success('Đổi avatar thành công!')
         },

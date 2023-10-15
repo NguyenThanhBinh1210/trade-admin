@@ -38,14 +38,36 @@ const Header = () => {
     >
       <div
         id='drawer-navigation-label'
+        style={{ textAlign: 'center' }}
         className={` ${
           showMenu ? 'hidden' : ''
         } text-blue-400 flex justify-between items-center text-base font-semibold uppercase dark:text-gray-400 `}
       >
-        <h2>Admin</h2>
+        {profile?.isAdmin && <h2 style={{ margin: 'auto' }}>Admin</h2>}
+        {profile?.isStaff && <h2 style={{ margin: 'auto' }}>Nhân viên</h2>}
       </div>
       <div className='py-4 overflow-y-auto flex flex-col justify-between h-[90%]'>
         <ul className='space-y-2'>
+          {profile?.isAdmin && (
+            <li>
+              <Link
+                to='/'
+                className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
+              >
+                <button>Dashboard</button>
+              </Link>
+            </li>
+          )}
+           {profile?.isStaff && (
+            <li>
+              <Link
+                to='/'
+                className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
+              >
+                <button>Dashboard</button>
+              </Link>
+            </li>
+          )}
           <li>
             <Link
               to='/comment'
@@ -68,7 +90,7 @@ const Header = () => {
                 to='/user'
                 className='flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg pl-4 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
               >
-                <button>Danh sách tài khoản</button>
+                <button>Danh sách nhân viên</button>
               </Link>
             </li>
           )}

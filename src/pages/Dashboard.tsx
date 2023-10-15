@@ -1,170 +1,48 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import moment from 'moment'
 import { useContext, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { toast } from 'react-toastify'
-import { blockKey, getAllKey, removeKey, searchKey } from '~/apis/product.api'
-import Modal from '~/components/Modal'
-import Loading from '~/components/Modal/Loading'
+import { deleteComment, getAllComment, getAllContact, getAllStaff, searchComment } from '~/apis/product.api'
+import CreateModal from '~/components/Modal/CreateModal'
 import { AppContext } from '~/contexts/app.context'
 
-const TokenUsers = () => {
-  const [isModalOpen, setModalOpen] = useState(false)
-  const [keyState, setKeyState] = useState([])
+const Dashboard = () => {
   const { profile } = useContext(AppContext)
-  const [search, setSearch] = useState<string>('')
-  const { isLoading } = useQuery({
-    queryKey: ['key', 1],
+  const [data, setData] = useState<any>([])
+  const { data: dataConfig, isLoading: isLoadingOption } = useQuery({
+    queryKey: ['comments', 2],
     queryFn: () => {
-      return getAllKey()
+      return getAllComment({
+        page: 1
+      })
     },
     onSuccess: (data) => {
-      setKeyState(data.data)
+      setData(data.data.comments)
     },
-    cacheTime: 60000
+    cacheTime: 120000
   })
-
-  const itemsPerPage = 8
-  const [currentPage, setCurrentPage] = useState(1)
-  const totalPages = Math.ceil(keyState?.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const currentData = keyState?.slice(startIndex, endIndex)
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page)
-    }
-  }
-  const queryClient = useQueryClient()
-  const toggleMutation = useMutation({
-    mutationFn: (data: any) => blockKey(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['key', 1] })
-    }
+  const { data: dataContact, isLoading: isLoadingOptionCT } = useQuery({
+    queryKey: ['contacts', 2],
+    queryFn: () => {
+      return getAllContact({
+        page: 1
+      })
+    },
+    onSuccess: (data) => {
+      setData(data.data.contacts)
+    },
+    cacheTime: 120000
   })
-  const searchMutation = useMutation({
-    mutationFn: (username: string) => searchKey(username)
+  const { data: dataStaff, isLoading: isLoadingOptionStaff } = useQuery('users', () => getAllStaff(), {
+    onSuccess: (data) => {
+      setData(data.data.users)
+    },
+    cacheTime: 120000
   })
-  const deleteMutation = useMutation({
-    mutationFn: (body: { key: string }) => removeKey(body)
-  })
-
-  const handleSearch = (e: any) => {
-    e.preventDefault()
-    searchMutation.mutate(search, {
-      onSuccess: (data) => {
-        setKeyState(data.data)
-        setCurrentPage(1)
-      },
-      onError: (error: any) => {
-        toast.warn(error.response.data)
-      }
-    })
-  }
-  const handleDelete = (key: string) => {
-    const body = { key: key }
-    deleteMutation.mutate(body, {
-      onSuccess: () => {
-        toast.warn('Đã xoá thành công!')
-        queryClient.invalidateQueries({ queryKey: ['key', 1] })
-      }
-    })
-  }
-  const handleToggle = (item: any) => {
-    if (item.code === 'block') {
-      const body: any = {
-        key: item.key,
-        code: 'open'
-      }
-      toggleMutation.mutate(body)
-    } else {
-      const body: any = {
-        key: item.key,
-        code: 'block'
-      }
-      toggleMutation.mutate(body)
-    }
-  }
 
   return (
-    <div className='p-5 flex flex-col h-full'>
-      <div className='flex justify-between items-center mb-3'>
-        <h1 className='mb-3  text-2xl font-bold dark:text-white'>Danh sách key</h1>
-        <div className='flex items-center space-x-4'>
-          <div className='relative w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600'>
-            <svg
-              className='absolute w-12 h-12 text-gray-400 -left-1'
-              fill='currentColor'
-              viewBox='0 0 20 20'
-              xmlns='http://www.w3.org/2000/svg'
-            >
-              <path
-                fillRule='evenodd'
-                d='M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z'
-                clipRule='evenodd'
-              ></path>
-            </svg>
-          </div>
-          <div className='font-medium dark:text-white'>
-            <div>{profile?.name}</div>
-          </div>
-        </div>
-      </div>
-      <div className='flex justify-between mb-3 mobile:flex-col tablet:flex-col'>
-        <div className='mb-2 flex items-center'>
-          <span className='my-4 font-bold dark:text-white'>Số lượng key: {keyState.length || 0}</span>
-          <button
-            type='button'
-            onClick={() => setModalOpen(true)}
-            className='ml-3 text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 h-[40px] text-center  dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
-          >
-            Tạo tài khoản
-          </button>
-        </div>
-        <div className='w-[50%] tablet:w-[75%] mobile:w-full'>
-          <form onSubmit={(e) => handleSearch(e)}>
-            <label htmlFor='default-search' className='mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white'>
-              Search
-            </label>
-            <div className='relative'>
-              <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
-                <svg
-                  className='w-4 h-4 text-gray-500 dark:text-gray-400'
-                  aria-hidden='true'
-                  xmlns='http://www.w3.org/2000/svg'
-                  fill='none'
-                  viewBox='0 0 20 20'
-                >
-                  <path
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z'
-                  />
-                </svg>
-              </div>
-              <input
-                type='search'
-                id='default-search'
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className='block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                placeholder='Search...'
-              />
-              <button
-                type='submit'
-                className='text-white absolute right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
-              >
-                Search
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+    <>
       <div className='flex flex-col gap-[30px] flex-1'>
-        {isLoading ? (
+        {isLoadingOption || isLoadingOptionCT || isLoadingOptionStaff ? (
           <div className='w-full flex justify-center items-center h-full gap-x-3'>
             <svg
               aria-hidden='true'
@@ -186,159 +64,35 @@ const TokenUsers = () => {
           </div>
         ) : (
           <>
-            <div className='relative flex-1 overflow-x-auto rounded-md shadow-md sm:rounded-lg'>
-              <table className='w-full text-sm text-left text-gray-500 dark:text-gray-400'>
-                <thead className='text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
-                  <tr>
-                    <th scope='col' className='px-6 py-3'>
-                      STT
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Username
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Key
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Hết hạn
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                {keyState.length !== 0 && (
-                  <tbody>
-                    {currentData.map((item: any, idx: number) => {
-                      const expirationDate = new Date(item.expirationDate)
-                      const createdDate = new Date()
-                      const timeDifference = Number(expirationDate) - Number(createdDate)
-                      const daysRemaining = Math.floor(timeDifference / (1000 * 60 * 60 * 24))
-                      return (
-                        <tr
-                          key={item._id}
-                          className='bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600'
-                        >
-                          <th
-                            scope='row'
-                            className='w-[100px] px-6 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white'
-                          >
-                            {'#' + (idx + 1)}
-                          </th>
-                          <th
-                            scope='row'
-                            className='px-6 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white'
-                          >
-                            {item.author?.username}
-                          </th>
-                          <th
-                            scope='row'
-                            className='px-6 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white'
-                          >
-                            {item.key}
-                          </th>
-                          <th
-                            scope='row'
-                            className='px-6 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white mobile:w-[200px]'
-                          >
-                            {daysRemaining + 1} ngày
-                          </th>
-                          <th
-                            scope='row'
-                            className='px-6 py-3 w-[200px] flex items-center gap-x-2 font-medium text-gray-900 whitespace-nowrap dark:text-white'
-                          >
-                            <button className='flex items-center' onClick={() => handleToggle(item)}>
-                              <label className=' relative inline-flex items-center cursor-pointer'>
-                                <input
-                                  type='checkbox'
-                                  className='sr-only peer'
-                                  checked={item.code === 'block' ? false : true}
-                                />
-                                <div className="w-11 h-6 bg-gray-200  peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600" />
-                              </label>
-                            </button>
-                            <button
-                              type='button'
-                              onClick={() => handleDelete(item.key)}
-                              className='text-white bg-red-700 hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-2 py-1 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900'
-                            >
-                              Xoá
-                            </button>
-                          </th>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                )}
-              </table>
+            <div className='p-5 '>
+              <div className='tablet:hidden mobile:hidden grid grid-cols-3 gap-x-10 mt-5 dark:text-white font-bold text-[16px]'>
+                <div className='col-span-1 text-center'>Nhân viên</div>
+                <div className='col-span-1 text-center'>Bình luận</div>
+                <div className='col-span-1 text-center'>Liên hệ</div>
+              </div>
+              <div className='grid grid-cols-3 gap-3 tablet:gap-y-6 mobile:gap-y-6 tablet:grid-cols-1 mobile:grid-cols-1 tablet:gap-x-0 mobile:gap-x-0 gap-x-10 mt-3 h-[251px]'>
+                <div className='text-center bg-emerald-300 pt-14 tablet:h-[300px] mobile:h-[200px] border-pink-400 border dark:border-none col-span-1 custom-scrollbar rounded-md relative overflow-x-auto shadow-md sm:rounded-lg'>
+                  <span className='my-4 text-[#ffff] m-auto text-9xl font-bold dark:text-white'>
+                    {dataStaff?.data.count || 0}
+                  </span>
+                </div>
+                <div className='text-center pt-14 bg-teal-300 tablet:h-[200px] mobile:h-[200px] border-pink-400 border dark:border-none col-span-1 custom-scrollbar rounded-md relative overflow-x-auto shadow-md sm:rounded-lg'>
+                  <span className='my-4 m-auto text-[#ffff] text-9xl font-bold dark:text-white'>
+                    {dataConfig?.data.count || 0}
+                  </span>
+                </div>
+                <div className='text-center bg-cyan-300 pt-14 tablet:h-[300px] mobile:h-[200px] border-pink-400 border dark:border-none col-span-1 custom-scrollbar rounded-md relative overflow-x-auto shadow-md sm:rounded-lg'>
+                  <span className='my-4 m-auto text-[#ffff] text-9xl font-bold dark:text-white'>
+                    {dataContact?.data.count || 0}
+                  </span>
+                </div>
+              </div>
             </div>
-            <nav aria-label='Page navigation example' className='mx-auto'>
-              <ul className='flex items-center -space-x-px h-10 text-base'>
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  className='flex items-center justify-center px-4 h-10 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white'
-                >
-                  <span className='sr-only'>Previous</span>
-                  <svg
-                    className='w-3 h-3'
-                    aria-hidden='true'
-                    xmlns='http://www.w3.org/2000/svg'
-                    fill='none'
-                    viewBox='0 0 6 10'
-                  >
-                    <path
-                      stroke='currentColor'
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth={2}
-                      d='M5 1 1 5l4 4'
-                    />
-                  </svg>
-                </button>
-                {Array.from({ length: totalPages }, (_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handlePageChange(index + 1)}
-                    className={
-                      currentPage === index + 1
-                        ? 'z-10 flex items-center justify-center px-4 h-10 leading-tight text-blue-600 border border-blue-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white'
-                        : 'flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white'
-                    }
-                  >
-                    {index + 1}
-                  </button>
-                ))}
-
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  className='flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white'
-                >
-                  <span className='sr-only'>Next</span>
-                  <svg
-                    className='w-3 h-3'
-                    aria-hidden='true'
-                    xmlns='http://www.w3.org/2000/svg'
-                    fill='none'
-                    viewBox='0 0 6 10'
-                  >
-                    <path
-                      stroke='currentColor'
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth={2}
-                      d='m1 9 4-4-4-4'
-                    />
-                  </svg>
-                </button>
-              </ul>
-            </nav>
           </>
         )}
       </div>
-      {searchMutation.isLoading || deleteMutation.isLoading || toggleMutation.isLoading ? <Loading></Loading> : null}
-      <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
-    </div>
+    </>
   )
 }
 
-export default TokenUsers
+export default Dashboard
